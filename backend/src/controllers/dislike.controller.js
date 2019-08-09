@@ -1,4 +1,4 @@
-const { devModel } = require('../models/dev.model');
+const DevModel = require('../models/dev.model');
 
 module.exports = {
   store: async (req, res) => {
@@ -7,16 +7,17 @@ module.exports = {
 
     try {
       const [dislikedDev, loggedDev] = await Promise.all([
-        devModel.findById(devId),
-        devModel.findById(user),
+        DevModel.findById(devId),
+        DevModel.findById(user),
       ]);
-
       loggedDev.dislikes.push(dislikedDev._id);
 
-      await devModel.save();
+      await loggedDev.save();
+
+      return res.json(loggedDev);
     } catch (error) {
+      console.log(error);
       return res.status(404).json({ error: 'User does not exist.' });
     }
-    return res.json(loggedDev);
   },
 };

@@ -16,14 +16,14 @@ module.exports = {
       dev = await DevModel.create({ name, username, avatar, bio });
     }
 
-    return res.json({ data: dev });
+    return res.json(dev);
   },
   index: async (req, res) => {
     const { user } = req.headers;
 
     const loggedDev = await DevModel.findById(user);
 
-    const users = DevModel.find({
+    const users = await DevModel.find({
       $and: [
         {
           _id: { $ne: user },
@@ -37,6 +37,6 @@ module.exports = {
       ],
     });
 
-    return res.json({ users });
+    return res.json(users);
   },
 };
