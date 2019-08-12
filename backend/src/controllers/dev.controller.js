@@ -3,8 +3,8 @@ const axios = require('axios');
 
 module.exports = {
   store: async (req, res) => {
-    const { username } = req.body;
-
+    let { username } = req.body;
+    username = username.trim();
     let dev = await DevModel.findOne({ username });
 
     if (!dev) {

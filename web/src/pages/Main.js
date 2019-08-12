@@ -4,11 +4,14 @@ import "./Main.css";
 import logo from "../images/logo.svg";
 import like from "../images/like.svg";
 import dislike from "../images/dislike.svg";
+import itsamatch from "../images/itsamatch.png";
+import io from "socket.io-client";
 
 import api from "../services/api";
 
 export default function Main({ match }) {
   const [users, setUsers] = useState([]);
+  const [matchDev, setMatchDev] = useState(null);
 
   useEffect(() => {
     async function loadUsers() {
@@ -20,6 +23,16 @@ export default function Main({ match }) {
     }
 
     loadUsers();
+  }, [match.params.id]);
+
+  useEffect(() => {
+    const socket = io("http://localhost:3333", {
+      query: { user: match.params.id }
+    });
+
+    socket.on("match", dev => {
+      setMatchDev(dev);
+    });
   }, [match.params.id]);
 
   async function handleLike(id) {
@@ -37,6 +50,7 @@ export default function Main({ match }) {
 
     setUsers(users.filter(user => user._id !== id));
   }
+
   return (
     <div className="main-container">
       <img src={logo} alt="Tindev" />
@@ -63,6 +77,19 @@ export default function Main({ match }) {
         </ul>
       ) : (
         <div className="empty">Out of devs :(</div>
+      )}
+
+      {matchDev && (
+        <div className="match-container">
+          <img src={itsamatch} alt="It's a Match" />
+          <img className="avatar" src={matchDev.avatar} alt="" />
+          <strong>{matchDev.name}</strong>
+          <p>{matchDev.bio}</p>
+
+          <button type="button" onClick={() => setMatchDev(null)}>
+            Close
+          </button>
+        </div>
       )}
     </div>
   );

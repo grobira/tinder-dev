@@ -9,7 +9,7 @@ mongoose
     'mongodb+srv://grobira:KDkFTb7h0KwzlTX3@remotemongo-wtm1e.mongodb.net/omnistack8?retryWrites=true&w=majority',
     { useNewUrlParser: true },
   )
-  .then(data => {
+  .then(() => {
     console.log('Connected to remote database.');
   })
   .catch(err => {
@@ -17,12 +17,30 @@ mongoose
     console.error('Failed to connected with remote database');
   });
 
-const server = express();
+const app = express();
+const server = require('http').Server(app);
 
-server.use(cors());
-server.use(morgan('dev'));
-server.use(express.json());
-server.use(routes);
+const io = require('socket.io')(server);
+
+const connectedUsers = {};
+
+io.on('connection', socket => {
+  const { user } = socket.handshake.query;
+  console.log(`Caching socket ${user} ${socket.id}`);
+  connectedUsers[user] = socket.id;
+});
+
+app.use((req, res, next) => {
+  req.io = io;
+  req.connectedUsers = connectedUsers;
+
+  return next();
+});
+
+app.use(cors());
+app.use(morgan('dev'));
+app.use(express.json());
+app.use(routes);
 
 server.listen(3333, () => {
   console.log('Listenning to port 3333.');
