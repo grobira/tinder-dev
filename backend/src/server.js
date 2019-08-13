@@ -2,6 +2,7 @@ const express = require('express');
 const routes = require('./routes');
 const morgan = require('morgan');
 const cors = require('cors');
+const expressInfo = require('./utils/expressInfo');
 require('./db.connection');
 
 const app = express();
@@ -29,5 +30,5 @@ app.use(express.json());
 app.use(routes);
 
 server.listen(3333, () => {
-  console.log('Listenning to port 3333.');
+  expressInfo(app);
 });
