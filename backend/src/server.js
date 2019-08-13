@@ -29,6 +29,6 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(routes);
 
-server.listen(3333, () => {
+server.listen(process.env.PORT || 3333, () => {
   expressInfo(app);
 });

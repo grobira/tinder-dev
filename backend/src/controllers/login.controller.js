@@ -1,5 +1,6 @@
 const axios = require('axios');
 const DevModel = require('../models/dev.model');
+const UserModel = require('../models/user.model');
 const { DevDto } = require('../models/dev.dto');
 
 module.exports = {
@@ -25,4 +26,28 @@ module.exports = {
 
     return res.json(DevDto(dev));
   },
+  login: async (req, res) => {
+    const { login, password } = req.body;
+
+    if (!login || !password) {
+      return res.status(400).send({
+        error: '400 - Bad Parameters',
+        message: 'Missing login or password',
+      });
+    }
+
+    if (validatePassword(password)) {
+      const exist = await UserModel.findOne({ login });
+
+      if (exist) {
+      } else {
+        const newUser = await UserModel.create({ login, password });
+        return res.redirect('/login');
+      }
+    }
+  },
 };
+
+function validatePassword(password) {
+  return true;
+}
