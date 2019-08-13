@@ -1,9 +1,16 @@
 const DevModel = require('../models/dev.model');
 const axios = require('axios');
+const { DevDto } = require('../models/dev.dto');
 
 module.exports = {
   store: async (req, res) => {
     let { username } = req.body;
+    if (!username) {
+      return res.status(400).send({
+        error: '400 - Bad Parameters',
+        message: 'Missing username on body',
+      });
+    }
     username = username.trim();
     let dev = await DevModel.findOne({ username });
 
@@ -16,11 +23,17 @@ module.exports = {
       dev = await DevModel.create({ name, username, avatar, bio });
     }
 
-    return res.json(dev);
+    return res.json(DevDto(dev));
   },
   index: async (req, res) => {
     const { user } = req.headers;
 
+    if (!user) {
+      return res.status(400).send({
+        error: '400 - Bad Parameters',
+        message: 'Missing user on header',
+      });
+    }
     const loggedDev = await DevModel.findById(user);
 
     const users = await DevModel.find({
@@ -37,6 +50,6 @@ module.exports = {
       ],
     });
 
-    return res.json(users);
+    return res.json(users.map(DevDto));
   },
 };
