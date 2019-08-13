@@ -31,7 +31,7 @@ function verifyJwtMiddleware(req, res, next) {
 
   verifyJwt(token)
     .then(decodedToken => {
-      req.user = decodedToken.data.user;
+      req.locals = decodedToken.data;
       next();
     })
     .catch(err => {

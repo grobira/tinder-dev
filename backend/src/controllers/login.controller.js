@@ -27,7 +27,7 @@ module.exports = {
     return res.json(DevDto(dev));
   },
   login: async (req, res) => {
-    const { login, password } = req.body;
+    const { login, password } = req.locals;
 
     if (!login || !password) {
       return res.status(400).send({
