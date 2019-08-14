@@ -4,9 +4,9 @@ const { DevDto } = require('../models/dev.dto');
 module.exports = {
   store: async (req, res) => {
     const { devId } = req.params;
-    const { user } = req.headers;
+    const { login } = req.locals;
 
-    if (!devId || !user) {
+    if (!devId || !login) {
       return res.status(400).send({
         error: '400 - Bad Parameters',
         message: 'Missing devId param or user on header',
@@ -16,7 +16,7 @@ module.exports = {
     try {
       const [dislikedDev, loggedDev] = await Promise.all([
         DevModel.findById(devId),
-        DevModel.findById(user),
+        DevModel.findOne({ username: login }),
       ]);
       loggedDev.dislikes.push(dislikedDev._id);
 

@@ -4,7 +4,7 @@ const { DevDto } = require('../models/dev.dto');
 module.exports = {
   store: async (req, res) => {
     const { devId } = req.params;
-    const { user } = req.headers;
+    const { login } = req.locals;
 
     if (!devId || !user) {
       return res.status(400).send({
@@ -16,16 +16,17 @@ module.exports = {
     try {
       const [likedDev, loggedDev] = await Promise.all([
         DevModel.findById(devId),
-        DevModel.findById(user),
+        DevModel.findOne({ username: login }),
       ]);
 
       console.log(`Dev ${loggedDev.name} liked ${likedDev.name}`);
       loggedDev.likes.push(likedDev._id);
 
-      await loggedDev.save();
-
       if (likedDev.likes.includes(loggedDev._id)) {
         console.log('its a match');
+        loggedDev.matches.push(likedDev._id);
+        likedDev.matches.push(loggedDev._id);
+        await likedDev.save();
         const loggedSocket = req.connectedUsers[user];
         const targetSocket = req.connectedUsers[devId];
 
@@ -39,6 +40,7 @@ module.exports = {
           req.io.to(targetSocket).emit('match', DevDto(loggedDev));
         }
       }
+      await loggedDev.save();
       return res.json(DevDto(loggedDev));
     } catch (error) {
       console.log(error);
