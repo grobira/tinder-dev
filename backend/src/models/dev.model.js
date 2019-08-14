@@ -9,6 +9,8 @@ const DevSchema = new Schema(
     username: {
       type: String,
       required: true,
+      unique: true,
+      trim: true,
     },
     bio: {
       type: String,
@@ -25,6 +27,12 @@ const DevSchema = new Schema(
       },
     ],
     dislikes: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Dev',
+      },
+    ],
+    matches: [
       {
         type: Schema.Types.ObjectId,
         ref: 'Dev',

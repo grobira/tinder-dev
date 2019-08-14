@@ -6,6 +6,7 @@ const UserSchema = new Schema({
     type: String,
     required: true,
     unique: true,
+    trim: true,
   },
   password: {
     type: String,
@@ -20,9 +21,5 @@ UserSchema.pre('save', function(next) {
   this.password = bcrypt.hashSync(this.password, 10);
   next();
 });
-
-UserSchema.methods.comparePassword = function(plaintext, callback) {
-  return callback(null, bcrypt.compareSync(plaintext, this.password));
-};
 
 module.exports = model('User', UserSchema);
