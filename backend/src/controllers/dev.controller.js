@@ -3,20 +3,20 @@ const { DevDto } = require('../models/dev.dto');
 
 module.exports = {
   index: async (req, res) => {
-    const { user } = req.headers;
+    const { login } = req.locals;
 
-    if (!user) {
+    if (!login) {
       return res.status(400).send({
         error: '400 - Bad Parameters',
         message: 'Missing user on header',
       });
     }
-    const loggedDev = await DevModel.findById(user);
+    const loggedDev = await DevModel.findOne({ username: login });
 
     const users = await DevModel.find({
       $and: [
         {
-          _id: { $ne: user },
+          _id: { $ne: loggedDev._id },
         },
         {
           _id: { $nin: loggedDev.likes },
